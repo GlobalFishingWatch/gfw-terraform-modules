@@ -1,0 +1,39 @@
+name: Terraform Module Validation & Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  validate_modules:
+    name: Validate Module Syntax
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Dynamically find all module directories
+        module:
+          - modules/cloudbuild-trigger
+          # ... add all your module paths here, or use a script to find them
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.x # Specify your desired Terraform version range
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+        working-directory: ${{ matrix.module }} # Run init within each module directory
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate
+        working-directory: ${{ matrix.module }} # Run validate within each module directory
