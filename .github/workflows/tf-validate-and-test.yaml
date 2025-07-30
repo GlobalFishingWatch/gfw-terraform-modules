@@ -1,4 +1,4 @@
-name: Terraform Module Validation & Tests
+name: Terraform Validate & Test
 
 on:
   pull_request:
@@ -9,8 +9,8 @@ on:
       - main
 
 jobs:
-  validate_modules:
-    name: Validate Module Syntax
+  validate_syntax:
+    name: Validate & Test
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -31,9 +31,14 @@ jobs:
       - name: Terraform Init
         id: init
         run: terraform init
-        working-directory: ${{ matrix.module }} # Run init within each module directory
+        working-directory: ${{ matrix.module }}
 
       - name: Terraform Validate
         id: validate
         run: terraform validate
-        working-directory: ${{ matrix.module }} # Run validate within each module directory
+        working-directory: ${{ matrix.module }}
+
+      - name: Terraform Test
+        id: test
+        run: terraform test
+        working-directory: ${{ matrix.module }}

@@ -10,7 +10,7 @@ on:
 
 jobs:
   terraform_fmt:
-    name: Check Terraform Format
+    name: Check Format
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
