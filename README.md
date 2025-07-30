@@ -70,3 +70,18 @@ output "main_branch_trigger_id" {
   value       = module.cloudbuild_trigger_main_branch.trigger_id
 }
 ```
+
+## 🤖 Makefile Commands
+
+This repository includes a `Makefile` to simplify common Terraform development and maintenance tasks.
+
+### Displaying Available Commands
+
+To see a list of all available commands and their descriptions, run:
+
+```bash
+[...]$ make help
+check               Check terraform format recursively.
+format              Auto-format terraform files recursively.
+help                Display this message
+```

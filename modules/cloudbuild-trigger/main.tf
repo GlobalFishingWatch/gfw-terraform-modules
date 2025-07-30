@@ -1,12 +1,12 @@
 locals {
   trigger_description_tag     = "A docker image is published every time a tag is created."
   trigger_description_branch  = "A docker image is published every a push to a branch is done."
-  trigger_description_default = "${var.tag != null ? local.trigger_description_tag : local.trigger_description_branch}"
-  trigger_description         = "${var.trigger_description != null ? var.trigger_description : local.trigger_description_default}"
-  trigger_suffix              = "${var.tag != null ? "tag" : var.branch}"
+  trigger_description_default = var.tag != null ? local.trigger_description_tag : local.trigger_description_branch
+  trigger_description         = var.trigger_description != null ? var.trigger_description : local.trigger_description_default
+  trigger_suffix              = var.tag != null ? "tag" : var.branch
   service_account             = "projects/${var.infra_project}/serviceAccounts/cloudbuild@${var.infra_project}.iam.gserviceaccount.com"
   image_name                  = "${var.registry_location}-docker.pkg.dev/${var.infra_project}/${var.registry_artifact}/${var.repo_name}"
-  tag_name                    = "${var.tag != null ? "$TAG_NAME" : "$BRANCH_NAME"}"
+  tag_name                    = var.tag != null ? "$TAG_NAME" : "$BRANCH_NAME"
 }
 
 output "trigger_id" {
@@ -65,8 +65,8 @@ resource "google_cloudbuild_trigger" "trigger" {
     timeout = "600s"
 
     options {
-      logging                = "CLOUD_LOGGING_ONLY"
-      dynamic_substitutions  = true
+      logging               = "CLOUD_LOGGING_ONLY"
+      dynamic_substitutions = true
     }
   }
 }
