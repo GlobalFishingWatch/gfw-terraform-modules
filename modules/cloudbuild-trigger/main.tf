@@ -1,9 +1,9 @@
 locals {
-  trigger_description_tag     = "A docker image is published every time a tag is created."
-  trigger_description_branch  = "A docker image is published every a push to a branch is done."
+  trigger_description_tag     = "Publishes a Docker image for tags matching the specified pattern."
+  trigger_description_branch  = "Publishes a Docker image for branches matching the specified pattern."
   trigger_description_default = var.tag != null ? local.trigger_description_tag : local.trigger_description_branch
   trigger_description         = var.trigger_description != null ? var.trigger_description : local.trigger_description_default
-  trigger_suffix              = var.tag != null ? "tag" : var.branch
+  trigger_suffix              = var.gke_deploy_enabled ? "tag-deploy" : "${var.tag != null ? "tag" : var.branch}"
   service_account             = "projects/${var.infra_project}/serviceAccounts/cloudbuild@${var.infra_project}.iam.gserviceaccount.com"
   image_name                  = "${var.registry_location}-docker.pkg.dev/${var.infra_project}/${var.registry_artifact}/${var.repo_name}"
   tag_name                    = var.tag != null ? "$TAG_NAME" : "$BRANCH_NAME"
@@ -61,6 +61,23 @@ resource "google_cloudbuild_trigger" "trigger" {
         "$_IMAGE_NAME:$_TAG_NAME"
       ]
     }
+
+    dynamic "step" {
+      for_each = var.gke_deploy_enabled ? [1] : []
+      content {
+        id   = "deploy"
+        name = "gcr.io/cloud-builders/gke-deploy"
+        args = [
+          "run",
+          "--image", "$_IMAGE_NAME:$_TAG_NAME",
+          "--filename=${var.gke_manifest}",
+          "--location=${var.gke_location}",
+          "--cluster=${var.gke_cluster}",
+          "--project=${var.gke_project}",
+        ]
+      }
+    }
+
 
     timeout = "600s"
 

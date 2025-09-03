@@ -1,7 +1,7 @@
 # Cloud Build Trigger Module
 
 This Terraform module creates a Google Cloud Build trigger linked to a GitHub repository,
-capable of building and pushing Docker images to Artifact Registry based on Git branch pushes or tag creations.
+capable of building and pushing Docker images to Artifact Registry based on Git branch pushes or tag creations, as well as optional deployment to Kubernetes.
 
 It is designed to be instantiated multiple times in your root module to cover different triggering scenarios
 (e.g., one instance for branch pushes, another for tag creations).

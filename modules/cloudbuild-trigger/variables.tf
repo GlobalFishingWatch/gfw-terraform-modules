@@ -57,3 +57,40 @@ variable "invert_regex" {
   default     = false
 }
 
+variable "gke_deploy_enabled" {
+  description = "Whether to run a Kubernetes deploy step after pushing the image."
+  type        = bool
+  default     = false
+}
+
+variable "gke_manifest" {
+  description = "Path to Kubernetes manifest to apply."
+  type        = string
+  default     = "k8s/prod/deployment.yaml"
+}
+
+variable "gke_location" {
+  description = "GKE location."
+  type        = string
+  default     = "us-central1"
+}
+
+variable "gke_cluster" {
+  description = "GKE cluster."
+  type        = string
+  default     = ""
+  validation {
+    condition     = !var.gke_deploy_enabled || length(var.gke_cluster) > 0
+    error_message = format(local.gke_required_msg, "gke_cluster")
+  }
+}
+
+variable "gke_project" {
+  description = "GKE project."
+  type        = string
+  default     = ""
+  validation {
+    condition     = !var.gke_deploy_enabled || length(var.gke_project) > 0
+    error_message = format(local.gke_required_msg, "gke_project")
+  }
+}
