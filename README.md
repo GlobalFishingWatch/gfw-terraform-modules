@@ -9,7 +9,7 @@
     <img src="https://github.com/GlobalFishingWatch/gfw-terraform-modules/actions/workflows/tf-validate-and-test.yaml/badge.svg"/>
   </a>
   <a>
-    <img alt="Terraform Version" src="https://img.shields.io/badge/Terraform-1.8-blue">
+    <img alt="Terraform Version" src="https://img.shields.io/badge/Terraform-1.12-blue">
   </a>
   <a>
     <img alt="Last release" src="https://img.shields.io/github/v/release/GlobalFishingWatch/gfw-terraform-modules">
