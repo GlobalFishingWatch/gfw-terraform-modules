@@ -94,3 +94,15 @@ variable "gke_project" {
     error_message = format(local.gke_required_msg, "gke_project")
   }
 }
+
+variable "gke_compile_command" {
+  description = "Optional command to compile/render manifests before deployment"
+  type        = string
+  default     = null
+}
+
+variable "gke_compile_image" {
+  description = "Container image used to run the compile command"
+  type        = string
+  default     = "gcr.io/cloud-builders/kubectl"
+}
