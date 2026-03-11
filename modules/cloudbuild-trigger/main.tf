@@ -63,6 +63,20 @@ resource "google_cloudbuild_trigger" "trigger" {
     }
 
     dynamic "step" {
+      for_each = (var.gke_deploy_enabled && var.gke_compile_command != null) ? [1] : []
+      content {
+        id         = "compile-manifest"
+        name       = var.gke_compile_image
+        entrypoint = "bash"
+
+        args = [
+          "-c",
+          var.gke_compile_command
+        ]
+      }
+    }
+
+    dynamic "step" {
       for_each = var.gke_deploy_enabled ? [1] : []
       content {
         id   = "deploy"
