@@ -36,6 +36,8 @@ resource "google_cloudbuild_trigger" "trigger" {
   substitutions = {
     _IMAGE_NAME = local.image_name
     _TAG_NAME   = local.tag_name
+    _PLATFORM   = var.platform
+
   }
 
   # Note: This Cloud Build trigger is configured to activate only for pushes
@@ -48,6 +50,7 @@ resource "google_cloudbuild_trigger" "trigger" {
       name = "gcr.io/cloud-builders/docker"
       args = [
         "build",
+        "--platform=$_PLATFORM",
         "-t", "$_IMAGE_NAME:$_TAG_NAME",
         "--target", "prod",
         "."
