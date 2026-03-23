@@ -57,6 +57,12 @@ variable "invert_regex" {
   default     = false
 }
 
+variable "platform" {
+  description = "Docker build platform (e.g. linux/amd64 or linux/arm64)"
+  type        = string
+  default     = "linux/amd64"
+}
+
 variable "gke_deploy_enabled" {
   description = "Whether to run a Kubernetes deploy step after pushing the image."
   type        = bool
