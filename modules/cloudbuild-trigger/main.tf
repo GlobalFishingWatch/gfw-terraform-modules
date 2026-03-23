@@ -44,24 +44,24 @@ resource "google_cloudbuild_trigger" "trigger" {
   # to branches matching 'var.branch' (e.g., 'main') and for new Git tags
   # matching 'var.tag'.
 
-  build {
+  build { # Use buildx so we can create multiarchitecture images
     step {
-      id   = "docker build"
-      name = "gcr.io/cloud-builders/docker"
+      id         = "docker buildx"
+      name       = "gcr.io/cloud-builders/docker"
+      entrypoint = "bash"
       args = [
-        "build",
-        "--platform=$_PLATFORM",
-        "-t", "$_IMAGE_NAME:$_TAG_NAME",
-        "--target", "prod",
-        "."
-      ]
-    }
-    step {
-      id   = "docker push tag"
-      name = "gcr.io/cloud-builders/docker"
-      args = [
-        "push",
-        "$_IMAGE_NAME:$_TAG_NAME"
+        "-c",
+        <<-EOT
+          docker buildx create --use
+          docker buildx inspect --bootstrap
+
+          docker buildx build \
+            --platform=$_PLATFORM \
+            -t $_IMAGE_NAME:$_TAG_NAME \
+            --target prod \
+            --push \
+            .
+        EOT
       ]
     }
 
