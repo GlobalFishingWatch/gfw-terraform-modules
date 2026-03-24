@@ -45,23 +45,45 @@ resource "google_cloudbuild_trigger" "trigger" {
   # matching 'var.tag'.
 
   build { # Use buildx so we can create multiarchitecture images
+    # 1. Enable ARM emulation (QEMU)
     step {
-      id         = "docker buildx"
-      name       = "gcr.io/cloud-builders/docker"
-      entrypoint = "bash"
+      id   = "init-qemu"
+      name = "gcr.io/cloud-builders/docker"
       args = [
-        "-c",
-        <<-EOT
-          docker buildx create --use
-          docker buildx inspect --bootstrap
+        "run",
+        "--privileged",
+        "--rm",
+        "tonistiigi/binfmt",
+        "--install",
+        "all"
+      ]
+    }
 
-          docker buildx build \
-            --platform=$_PLATFORM \
-            -t $_IMAGE_NAME:$_TAG_NAME \
-            --target prod \
-            --push \
-            .
-        EOT
+    # 2. Create and use buildx builder
+    step {
+      id   = "create-builder"
+      name = "gcr.io/cloud-builders/docker"
+      args = ["buildx", "create", "--name", "mybuilder", "--use"]
+    }
+
+    # 3. Bootstrap builder (IMPORTANT: enables arm64)
+    step {
+      id   = "bootstrap-builder"
+      name = "gcr.io/cloud-builders/docker"
+      args = ["buildx", "inspect", "--bootstrap"]
+    }
+
+    # 4. Build + push image
+    step {
+      id   = "build-image"
+      name = "gcr.io/cloud-builders/docker"
+      args = [
+        "buildx", "build",
+        "--platform", "$_PLATFORM",
+        "-t", "$_IMAGE_NAME:$_TAG_NAME",
+        "--target", "prod",
+        "--push",
+        "."
       ]
     }
 
@@ -96,11 +118,12 @@ resource "google_cloudbuild_trigger" "trigger" {
     }
 
 
-    timeout = "600s"
+    timeout = "1200s"
 
     options {
       logging               = "CLOUD_LOGGING_ONLY"
       dynamic_substitutions = true
+      machine_type          = var.machine_type
     }
   }
 }
