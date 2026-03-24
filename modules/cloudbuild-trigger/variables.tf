@@ -63,6 +63,11 @@ variable "platform" {
   default     = "linux/amd64"
 }
 
+variable "machine_type" {
+  type    = string
+  default = "E2_MEDIUM"
+}
+
 variable "gke_deploy_enabled" {
   description = "Whether to run a Kubernetes deploy step after pushing the image."
   type        = bool
@@ -112,3 +117,4 @@ variable "gke_compile_image" {
   type        = string
   default     = "gcr.io/cloud-builders/kubectl"
 }
+
