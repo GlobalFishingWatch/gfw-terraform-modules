@@ -68,6 +68,12 @@ variable "machine_type" {
   default = "E2_MEDIUM"
 }
 
+variable "image_name_suffix" {
+  description = "Suffix to add to the image name"
+  type        = string
+  default     = ""
+}
+
 variable "gke_deploy_enabled" {
   description = "Whether to run a Kubernetes deploy step after pushing the image."
   type        = bool

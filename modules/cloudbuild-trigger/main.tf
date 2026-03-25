@@ -5,7 +5,7 @@ locals {
   trigger_description         = var.trigger_description != null ? var.trigger_description : local.trigger_description_default
   trigger_suffix              = var.gke_deploy_enabled ? "tag-deploy" : "${var.tag != null ? "tag" : var.branch}"
   service_account             = "projects/${var.infra_project}/serviceAccounts/cloudbuild@${var.infra_project}.iam.gserviceaccount.com"
-  image_name                  = "${var.registry_location}-docker.pkg.dev/${var.infra_project}/${var.registry_artifact}/${var.repo_name}"
+  image_name                  = "${var.registry_location}-docker.pkg.dev/${var.infra_project}/${var.registry_artifact}/${var.repo_name}${var.image_name_suffix}"
   tag_name                    = var.tag != null ? "$TAG_NAME" : "$BRANCH_NAME"
 }
 
