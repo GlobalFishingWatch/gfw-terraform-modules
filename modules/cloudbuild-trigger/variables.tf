@@ -197,3 +197,13 @@ variable "dataflow_project" {
     error_message = format(local.dataflow_required_msg, "dataflow_project")
   }
 }
+
+variable "dataflow_service_account" {
+  type    = string
+  default = ""
+
+  validation {
+    condition     = !var.dataflow_deploy_enabled || length(var.dataflow_service_account) > 0
+    error_message = format(local.dataflow_required_msg, "dataflow_service_account")
+  }
+}
