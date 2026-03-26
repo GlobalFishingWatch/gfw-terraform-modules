@@ -3,10 +3,12 @@ locals {
   trigger_description_branch  = "Publishes a Docker image for branches matching the specified pattern."
   trigger_description_default = var.tag != null ? local.trigger_description_tag : local.trigger_description_branch
   trigger_description         = var.trigger_description != null ? var.trigger_description : local.trigger_description_default
-  trigger_suffix              = var.gke_deploy_enabled ? "tag-deploy" : "${var.tag != null ? "tag" : var.branch}"
+  trigger_suffix              = var.gke_deploy_enabled || var.dataflow_deploy_enabled ? "tag-deploy" : "${var.tag != null ? "tag" : var.branch}"
   service_account             = "projects/${var.infra_project}/serviceAccounts/cloudbuild@${var.infra_project}.iam.gserviceaccount.com"
   image_name                  = "${var.registry_location}-docker.pkg.dev/${var.infra_project}/${var.registry_artifact}/${var.repo_name}${var.image_name_suffix}"
   tag_name                    = var.tag != null ? "$TAG_NAME" : "$BRANCH_NAME"
+  dataflow_template_gcs_path  = "${var.dataflow_template_gcs_prefix}/${var.repo_name}/${local.tag_name}.json"
+
 }
 
 output "trigger_id" {
@@ -90,7 +92,7 @@ resource "google_cloudbuild_trigger" "trigger" {
     dynamic "step" {
       for_each = (var.gke_deploy_enabled && var.gke_compile_command != null) ? [1] : []
       content {
-        id         = "compile-manifest"
+        id         = "gke-compile-manifest"
         name       = var.gke_compile_image
         entrypoint = "bash"
 
@@ -104,7 +106,7 @@ resource "google_cloudbuild_trigger" "trigger" {
     dynamic "step" {
       for_each = var.gke_deploy_enabled ? [1] : []
       content {
-        id   = "deploy"
+        id   = "gke-deploy"
         name = "gcr.io/cloud-builders/gke-deploy"
         args = [
           "run",
@@ -117,8 +119,60 @@ resource "google_cloudbuild_trigger" "trigger" {
       }
     }
 
+    dynamic "step" {
+      for_each = var.dataflow_deploy_enabled ? [1] : []
+      content {
+        id         = "dataflow-drain"
+        name       = "gcr.io/google.com/cloudsdktool/cloud-sdk"
+        entrypoint = "bash"
+        args = [
+          var.dataflow_drain_script,
+          var.dataflow_project,
+          var.dataflow_region,
+          var.dataflow_job_name,
+        ]
+      }
+    }
 
-    timeout = "1200s"
+    dynamic "step" {
+      for_each = var.dataflow_deploy_enabled ? [1] : []
+      content {
+        id         = "dataflow-build-template"
+        name       = "gcr.io/google.com/cloudsdktool/cloud-sdk"
+        entrypoint = "gcloud"
+
+        args = [
+          "dataflow", "flex-template", "build", local.dataflow_template_gcs_path,
+          "--image", "$_IMAGE_NAME:$_TAG_NAME",
+          "--sdk-language", "PYTHON",
+          "--metadata-file", var.dataflow_metadata_file,
+        ]
+      }
+    }
+
+    dynamic "step" {
+      for_each = var.dataflow_deploy_enabled ? [1] : []
+      content {
+        id         = "dataflow-deploy"
+        name       = "gcr.io/google.com/cloudsdktool/cloud-sdk"
+        entrypoint = "gcloud"
+
+        args = compact([
+          "dataflow", "flex-template",
+          "run", var.dataflow_job_name,
+          "--region=${var.dataflow_region}",
+          "--template-file-gcs-location", local.dataflow_template_gcs_path,
+          "--temp-location=${var.dataflow_temp_location}/${var.repo_name}",
+          "--staging-location=${var.dataflow_staging_location}/${var.repo_name}",
+          var.dataflow_config_file != null ? "--parameters=config-file=${var.dataflow_config_file}" : null,
+          "--parameters=sdk_container_image=$_IMAGE_NAME:$_TAG_NAME",
+
+        ])
+      }
+    }
+
+
+    timeout = var.timeout
 
     options {
       logging               = "CLOUD_LOGGING_ONLY"
