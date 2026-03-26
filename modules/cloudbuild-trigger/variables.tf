@@ -187,3 +187,13 @@ variable "dataflow_region" {
   type        = string
   default     = "us-central1"
 }
+
+variable "dataflow_project" {
+  description = "GCP project to use when dataflow deployment is enabled."
+  type        = string
+  default     = ""
+  validation {
+    condition     = !var.dataflow_deploy_enabled || length(var.dataflow_project) > 0
+    error_message = format(local.dataflow_required_msg, "dataflow_project")
+  }
+}
