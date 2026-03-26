@@ -161,12 +161,13 @@ resource "google_cloudbuild_trigger" "trigger" {
           "dataflow", "flex-template",
           "run", var.dataflow_job_name,
           "--region=${var.dataflow_region}",
+          "--service-account-email=${var.dataflow_service_account}",
+          "--project=${var.dataflow_project}",
           "--template-file-gcs-location", local.dataflow_template_gcs_path,
           "--temp-location=${var.dataflow_temp_location}/${var.repo_name}",
           "--staging-location=${var.dataflow_staging_location}/${var.repo_name}",
           var.dataflow_config_file != null ? "--parameters=config-file=${var.dataflow_config_file}" : null,
           "--parameters=sdk_container_image=$_IMAGE_NAME:$_TAG_NAME",
-
         ])
       }
     }
