@@ -30,7 +30,7 @@ resource "google_cloudbuild_trigger" "manual_deploy_dataflow" {
   build {
     step {
       id         = "validate-tag"
-      name       = "gcr.io/cloud-builders/bash"
+      name       = "gcr.io/google.com/cloudsdktool/cloud-sdk"
       entrypoint = "bash"
       args = ["-c", <<-EOT
         if [[ -z "$TAG_NAME" ]]; then
