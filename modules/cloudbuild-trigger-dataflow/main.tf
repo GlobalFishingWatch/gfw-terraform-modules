@@ -55,18 +55,6 @@ resource "google_cloudbuild_trigger" "manual_deploy_dataflow" {
     }
 
     step {
-      id         = "dataflow-drain"
-      name       = "gcr.io/google.com/cloudsdktool/cloud-sdk"
-      entrypoint = "bash"
-      args = [
-        var.dataflow_drain_script,
-        var.dataflow_project,
-        var.dataflow_region,
-        var.dataflow_job_name,
-      ]
-    }
-
-    step {
       id         = "dataflow-build-template"
       name       = "gcr.io/google.com/cloudsdktool/cloud-sdk"
       entrypoint = "gcloud"
@@ -76,6 +64,18 @@ resource "google_cloudbuild_trigger" "manual_deploy_dataflow" {
         "--image", "$_IMAGE_NAME:$TAG_NAME",
         "--sdk-language", "PYTHON",
         "--metadata-file", var.dataflow_metadata_file,
+      ]
+    }
+
+    step {
+      id         = "dataflow-drain"
+      name       = "gcr.io/google.com/cloudsdktool/cloud-sdk"
+      entrypoint = "bash"
+      args = [
+        var.dataflow_drain_script,
+        var.dataflow_project,
+        var.dataflow_region,
+        var.dataflow_job_name,
       ]
     }
 
