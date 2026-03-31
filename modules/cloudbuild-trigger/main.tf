@@ -36,9 +36,9 @@ resource "google_cloudbuild_trigger" "trigger" {
 
   substitutions = {
     _DOCKERFILE_PATH = local.dockerfile_path
-    _IMAGE_NAME = local.image_name
-    _TAG_NAME   = local.tag_name
-    _PLATFORM   = var.platform
+    _IMAGE_NAME      = local.image_name
+    _TAG_NAME        = local.tag_name
+    _PLATFORM        = var.platform
 
   }
 
