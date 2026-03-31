@@ -41,6 +41,7 @@ module "cloudbuild_trigger_main_branch" {
   infra_project     = "gfw-int-infrastructure"   # Defaults to "gfw-int-infrastructure"
   registry_location = "us-central1"              # Defaults to "us-central1"
   trigger_location  = "us-central1"              # Defaults to "us-central1"
+  dockerfile_path   = "Dockerfile"               # Defaults to "Dockerfile"
 
   # --- Trigger-specific Settings ---
   # This instance is configured for a branch trigger:
