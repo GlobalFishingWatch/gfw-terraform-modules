@@ -1,5 +1,4 @@
 locals {
-  dockerfile_path             = var.dockerfile_path != null ? var.dockerfile_path : "Dockerfile"
   trigger_description_tag     = "Publishes a Docker image for tags matching the specified pattern."
   trigger_description_branch  = "Publishes a Docker image for branches matching the specified pattern."
   trigger_description_default = var.tag != null ? local.trigger_description_tag : local.trigger_description_branch
@@ -35,7 +34,7 @@ resource "google_cloudbuild_trigger" "trigger" {
   service_account = local.service_account
 
   substitutions = {
-    _DOCKERFILE_PATH = local.dockerfile_path
+    _DOCKERFILE_PATH = var.dockerfile_path
     _IMAGE_NAME      = local.image_name
     _TAG_NAME        = local.tag_name
     _PLATFORM        = var.platform
