@@ -34,9 +34,10 @@ resource "google_cloudbuild_trigger" "trigger" {
   service_account = local.service_account
 
   substitutions = {
-    _IMAGE_NAME = local.image_name
-    _TAG_NAME   = local.tag_name
-    _PLATFORM   = var.platform
+    _DOCKERFILE_PATH = var.dockerfile_path
+    _IMAGE_NAME      = local.image_name
+    _TAG_NAME        = local.tag_name
+    _PLATFORM        = var.platform
 
   }
 
@@ -81,6 +82,7 @@ resource "google_cloudbuild_trigger" "trigger" {
         "buildx", "build",
         "--platform", "$_PLATFORM",
         "-t", "$_IMAGE_NAME:$_TAG_NAME",
+        "-f", "$_DOCKERFILE_PATH",
         "--target", "prod",
         "--push",
         "."

@@ -39,6 +39,12 @@ variable "repo_owner" {
 
 }
 
+variable "dockerfile_path" {
+  description = "Specifies the Dockerfile to use."
+  type        = string
+  default     = "Dockerfile"
+}
+
 variable "branch" {
   description = "Branch to trigger on."
   type        = string

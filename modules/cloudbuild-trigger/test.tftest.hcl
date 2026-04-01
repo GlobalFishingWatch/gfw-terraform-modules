@@ -13,6 +13,7 @@ variables {
   infra_project     = "mock-infra-project"
   registry_location = "us-central1"
   trigger_location  = "us-central1"
+  dockerfile_path   = "path/to/test.Dockerfile"
 }
 
 run "basic_trigger_creation_plan" {
