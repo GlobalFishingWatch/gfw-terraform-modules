@@ -5,8 +5,10 @@ locals {
   trigger_description         = var.trigger_description != null ? var.trigger_description : local.trigger_description_default
   trigger_suffix              = var.gke_deploy_enabled ? "tag-deploy" : "${var.tag != null ? "tag" : var.branch}"
   service_account             = "projects/${var.infra_project}/serviceAccounts/cloudbuild@${var.infra_project}.iam.gserviceaccount.com"
-  image_name                  = "${var.registry_location}-docker.pkg.dev/${var.infra_project}/${var.registry_artifact}/${var.repo_name}${var.image_name_suffix}"
-  tag_name                    = var.tag != null ? "$TAG_NAME" : "$BRANCH_NAME"
+  monorepo_suffix             = (var.tag != null && strcontains(var.tag, "@")) ? trimprefix(split("@", var.tag)[0], var.repo_name) : ""
+  monorepo_tag                = (var.tag != null && strcontains(var.tag, "@")) ? split("@", var.tag)[1] : ""
+  image_name                  = "${var.registry_location}-docker.pkg.dev/${var.infra_project}/${var.registry_artifact}/${var.repo_name}${local.monorepo_suffix}"
+  tag_name                    = var.tag == null ? "$BRANCH_NAME" : ( strcontains(var.tag, "@") ? local.monorepo_tag : "$TAG_NAME" )
 }
 
 output "trigger_id" {
@@ -15,7 +17,7 @@ output "trigger_id" {
 }
 
 resource "google_cloudbuild_trigger" "trigger" {
-  name        = "${var.repo_name}-${local.trigger_suffix}"
+  name        = "${var.repo_name}${local.monorepo_suffix}-${local.trigger_suffix}"
   description = local.trigger_description
   location    = var.trigger_location
   project     = var.infra_project
