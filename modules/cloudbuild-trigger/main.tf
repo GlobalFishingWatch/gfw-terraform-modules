@@ -8,7 +8,7 @@ locals {
   monorepo_suffix             = (var.tag != null && strcontains(var.tag, "@")) ? trimprefix(split("@", var.tag)[0], var.repo_name) : ""
   monorepo_tag                = (var.tag != null && strcontains(var.tag, "@")) ? split("@", var.tag)[1] : ""
   image_name                  = "${var.registry_location}-docker.pkg.dev/${var.infra_project}/${var.registry_artifact}/${var.repo_name}${local.monorepo_suffix}"
-  tag_name                    = var.tag == null ? "$BRANCH_NAME" : ( strcontains(var.tag, "@") ? local.monorepo_tag : "$TAG_NAME" )
+  tag_name                    = var.tag == null ? "$BRANCH_NAME" : (strcontains(var.tag, "@") ? local.monorepo_tag : "$TAG_NAME")
 }
 
 output "trigger_id" {
