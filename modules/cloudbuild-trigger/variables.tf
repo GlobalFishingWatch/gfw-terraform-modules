@@ -74,12 +74,6 @@ variable "machine_type" {
   default = "E2_MEDIUM"
 }
 
-variable "image_name_suffix" {
-  description = "Suffix to add to the image name"
-  type        = string
-  default     = ""
-}
-
 variable "timeout" {
   description = "Timeout for the trigger"
   type        = string
