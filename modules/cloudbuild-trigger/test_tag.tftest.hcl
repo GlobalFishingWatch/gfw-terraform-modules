@@ -5,8 +5,8 @@ mock_provider "google" {
 variables {
   repo_name    = "my-app-repo"
   repo_owner   = "my-org"
-  branch       = "my-branch" # Testing a 'my-branch' branch trigger
-  tag          = null        # Not a tag trigger
+  branch       = null
+  tag          = "my-app-repo-package@1.0.0"
   invert_regex = false
 
   registry_artifact = "my-docker-registry"
@@ -16,11 +16,11 @@ variables {
   dockerfile_path   = "path/to/test.Dockerfile"
 }
 
-run "basic_branch_trigger_creation_plan" {
+run "basic_tag_trigger_creation_plan" {
   command = plan
 
   assert {
-    condition     = google_cloudbuild_trigger.trigger.name == "my-app-repo-my-branch"
-    error_message = "Expected trigger name to be 'my-app-repo-my-branch'."
+    condition     = google_cloudbuild_trigger.trigger.name == "my-app-repo-package-tag"
+    error_message = "Expected trigger name to be 'my-app-repo-package-tag'."
   }
 }
