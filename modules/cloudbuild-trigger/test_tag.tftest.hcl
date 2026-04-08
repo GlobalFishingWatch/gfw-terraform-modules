@@ -6,7 +6,7 @@ variables {
   repo_name    = "my-app-repo"
   repo_owner   = "my-org"
   branch       = null
-  tag          = "my-app-repo-package@1.0.0"
+  tag          = "^my-app-repo-package@.*$"
   invert_regex = false
 
   registry_artifact = "my-docker-registry"
@@ -22,5 +22,10 @@ run "basic_tag_trigger_creation_plan" {
   assert {
     condition     = google_cloudbuild_trigger.trigger.name == "my-app-repo-package-tag"
     error_message = "Expected trigger name to be 'my-app-repo-package-tag'."
+  }
+
+  assert {
+    condition     = google_cloudbuild_trigger.trigger.github[0].push[0].tag == "^my-app-repo-package@.*$"
+    error_message = "Expected trigger tag to be '^my-app-repo-package@.*$'."
   }
 }
