@@ -45,6 +45,17 @@ variable "dockerfile_path" {
   default     = "Dockerfile"
 }
 
+variable "docker_builder_image" {
+  description = <<-EOT
+    Container image used to run the docker/buildx steps.
+    Pinned to a specific tag, not ":latest" -- ":latest" resolves to Docker 20.10.24
+    (built April 2023), which fails to pull images with zstd-compressed OCI layers
+    (e.g. apache/beam_python3.12_sdk since ~2.7x) with "archive/tar: invalid tar header".
+  EOT
+  type        = string
+  default     = "gcr.io/cloud-builders/docker:24.0.9"
+}
+
 variable "branch" {
   description = "Branch to trigger on."
   type        = string
