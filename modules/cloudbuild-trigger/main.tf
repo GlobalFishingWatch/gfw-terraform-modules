@@ -51,7 +51,7 @@ resource "google_cloudbuild_trigger" "trigger" {
     # 1. Enable ARM emulation (QEMU)
     step {
       id   = "init-qemu"
-      name = "gcr.io/cloud-builders/docker"
+      name = var.docker_builder_image
       args = [
         "run",
         "--privileged",
@@ -65,21 +65,21 @@ resource "google_cloudbuild_trigger" "trigger" {
     # 2. Create and use buildx builder
     step {
       id   = "create-builder"
-      name = "gcr.io/cloud-builders/docker"
+      name = var.docker_builder_image
       args = ["buildx", "create", "--name", "mybuilder", "--use"]
     }
 
     # 3. Bootstrap builder (IMPORTANT: enables arm64)
     step {
       id   = "bootstrap-builder"
-      name = "gcr.io/cloud-builders/docker"
+      name = var.docker_builder_image
       args = ["buildx", "inspect", "--bootstrap"]
     }
 
     # 4. Build + push image
     step {
       id   = "build-image"
-      name = "gcr.io/cloud-builders/docker"
+      name = var.docker_builder_image
       args = [
         "buildx", "build",
         "--platform", "$_PLATFORM",
